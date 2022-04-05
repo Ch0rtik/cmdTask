@@ -1,3 +1,5 @@
+package uniq;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +57,7 @@ public class Merger {
     }
 
     private List<String> getLinesList(String lines) {
-        return new ArrayList<>(Arrays.asList(lines.split("(\\\\n)")));
+        return new ArrayList<>(Arrays.asList(lines.split("\\\\r?\\\\n")));
     }
 
     private List<String> merge(List<String> linesList) {
