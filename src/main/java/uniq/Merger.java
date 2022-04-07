@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 public class Merger {
     private final boolean uniqueOnly;
     private final LineHandler lh;
-    private IOHandler io;
 
     public Merger(boolean regIgnored, int skip, boolean countMerged, boolean uniqueOnly) {
         this.uniqueOnly = uniqueOnly;
@@ -18,11 +17,10 @@ public class Merger {
     }
 
     public void merge(List<String> arguments, File outFile) throws IOException{
-        io = new IOHandler(arguments, outFile);
-        mergeLines();
+        mergeLines(new IOHandler(arguments, outFile));
     }
 
-    private void mergeLines() {
+    private void mergeLines(IOHandler io) {
         String line;
         String prev = io.getLine();
         int cnt = 1;
@@ -68,16 +66,9 @@ public class Merger {
             return withSkip.apply(line);
         }
 
-        public List<String> getLinesList(List<String> arguments) {
-            return splitByLines(String.join(" ", arguments));
-        }
-
-        private List<String> splitByLines(String lines) {
-            return new ArrayList<>(Arrays.asList(lines.split("\\r?\\n")));
-        }
     }
 
-    private class IOHandler {
+    private static class IOHandler {
         private final Supplier<String> getLine;
         private final Consumer<String> printLine;
         private final Runnable closeIO;
@@ -100,12 +91,12 @@ public class Merger {
                     try {
                         reader.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        System.err.println(e.getMessage());
                     }
                 };
 
             } else {
-                Iterator<String> linesIterator = lh.getLinesList(arguments).listIterator();
+                Iterator<String> linesIterator = getLinesList(arguments).listIterator();
                 getLine = () -> {
                     try {
                         return linesIterator.next();
@@ -118,7 +109,7 @@ public class Merger {
 
             if (outFile != null) {
                 if (!outFile.exists()) {
-                    throw new IOException(String.format("File %s does no exist", outFile.getName()));
+                    throw new IOException(String.format("File %s does not exist", outFile.getName()));
                 }
 
                 BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
@@ -127,7 +118,7 @@ public class Merger {
                         writer.write(line);
                         writer.newLine();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        System.err.println(e.getMessage());
                     }
                 };
 
@@ -135,7 +126,7 @@ public class Merger {
                     try {
                         writer.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        System.err.println(e.getMessage());
                     }
                 };
             } else {
@@ -157,8 +148,16 @@ public class Merger {
             printLine.accept(line);
         }
 
-        private void closeIO() {
+        public void closeIO() {
             closeIO.run();
+        }
+
+        public List<String> getLinesList(List<String> arguments) {
+            return splitByLines(String.join(" ", arguments));
+        }
+
+        private List<String> splitByLines(String lines) {
+            return new ArrayList<>(Arrays.asList(lines.split("\\r?\\n")));
         }
     }
 }
