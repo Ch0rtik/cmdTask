@@ -152,7 +152,7 @@ public class Merger {
             closeIO.run();
         }
 
-        public List<String> getLinesList(List<String> arguments) {
+        private List<String> getLinesList(List<String> arguments) {
             return splitByLines(String.join(" ", arguments));
         }
 
