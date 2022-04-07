@@ -1,15 +1,16 @@
 package uniq;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class Merger {
     private final boolean uniqueOnly;
     private final LineHandler lineHandler;
+    private IOHandler io;
 
     public Merger(boolean regIgnored, int skip, boolean countMerged, boolean uniqueOnly) {
         this.uniqueOnly = uniqueOnly;
@@ -17,34 +18,30 @@ public class Merger {
     }
 
     public void merge(List<String> arguments, File outFile) throws IOException{
-        Printer.print(merge(lineHandler.getLinesList(arguments)), outFile);
+        io = new IOHandler(arguments, outFile);
+        mergeLines();
     }
 
-    private List<String> merge(List<String> linesList) {
-        String prev = "";
-        List<String> result = new ArrayList<>();
+    private void mergeLines() {
+        String line;
+        String prev = io.getLine();
         int cnt = 1;
 
-        for (String line: linesList) {
+        while ((line = io.getLine()) != null) {
             if (lineHandler.linesEqual(prev, line)) {
                 cnt ++;
                 continue;
             }
-            if (!uniqueOnly || cnt == 1) result.add(lineHandler.withCounter(prev, cnt));
+            if (!uniqueOnly || cnt == 1) io.printLine(lineHandler.withCounter(prev, cnt));
             prev = line;
             cnt = 1;
         }
+        if (!uniqueOnly || cnt == 1) io.printLine(lineHandler.withCounter(prev, cnt));
 
-        if (!uniqueOnly || cnt == 1) result.add(lineHandler.withCounter(prev, cnt));
-
-        result.remove(0);
-
-        return result;
+        io.closeIO();
     }
 
-
     private class LineHandler {
-
         private final BiFunction<String, String, Boolean> linesEqual;
         private final BiFunction<String, Integer, String> withCounter;
         private final Function<String, String> withSkip;
@@ -71,56 +68,97 @@ public class Merger {
             return withSkip.apply(line);
         }
 
-        public List<String> getLinesList(List<String> arguments) throws IOException {
-            if (arguments.size() == 1 && arguments.get(0).endsWith(".txt"))
-                return getLinesList(new File(arguments.get(0)));
-            return getLinesList(String.join(" ", arguments));
+        public List<String> getLinesList(List<String> arguments) {
+            return splitByLines(String.join(" ", arguments));
         }
 
-        private List<String> getLinesList(File inFile) throws IOException {
-            try (BufferedReader reader = new BufferedReader(new FileReader(inFile))) {
-                List<String> linesList = new ArrayList<>();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    linesList.add(line);
-                }
-                return linesList;
-            }
-        }
-
-        private List<String> getLinesList(String lines) {
+        private List<String> splitByLines(String lines) {
             return new ArrayList<>(Arrays.asList(lines.split("\\r?\\n")));
         }
-
-
     }
 
-    private static class Printer {
-        public static void print(List<String> result, File outFile) throws IOException {
-            if (outFile == null) {
-                cmdPrint(result);
+    private class IOHandler {
+        private final Supplier<String> getLine;
+        private final Consumer<String> printLine;
+        private final Runnable closeIO;
+
+        public IOHandler(List<String> arguments, File outFile) throws IOException {
+            Runnable closeReader;
+            Runnable closeWriter;
+
+            if (arguments.size() == 1 && arguments.get(0).endsWith(".txt")) {
+                BufferedReader reader = new BufferedReader(new FileReader(arguments.get(0)));
+                getLine = () -> {
+                    try {
+                        return reader.readLine();
+                    } catch (IOException e) {
+                        System.err.println(e.getMessage());
+                        return null;
+                    }
+                };
+                closeReader = () -> {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                };
+
             } else {
-                filePrint(result, outFile);
+                Iterator<String> linesIterator = lineHandler.getLinesList(arguments).listIterator();
+                getLine = () -> {
+                    try {
+                        return linesIterator.next();
+                    } catch (NoSuchElementException e) {
+                        return null;
+                    }
+                };
+                closeReader = () -> {};
             }
-        }
 
-        private static void cmdPrint(List<String> result) {
-            for (String line : result) {
-                System.out.println(line);
-            }
-        }
-
-        private static void filePrint(List<String> result, File outFile) throws IOException{
-            if (!outFile.exists()) {
-                throw new IOException(String.format("File %s does no exist", outFile.getName()));
-            }
-            try(BufferedWriter writer = new BufferedWriter(new FileWriter(outFile))){
-                for (String line : result) {
-                    writer.write(line);
-                    writer.newLine();
+            if (outFile != null) {
+                if (!outFile.exists()) {
+                    throw new IOException(String.format("File %s does no exist", outFile.getName()));
                 }
+
+                BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
+                printLine = (String line) -> {
+                    try{
+                        writer.write(line);
+                        writer.newLine();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                };
+
+                closeWriter = () -> {
+                    try {
+                        writer.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                };
+            } else {
+                printLine = System.out::println;
+                closeWriter = () -> {};
             }
+
+            closeIO = () -> {
+                closeReader.run();
+                closeWriter.run();
+            };
+        }
+
+        public String getLine() {
+            return getLine.get();
+        }
+
+        public void printLine(String line) {
+            printLine.accept(line);
+        }
+
+        private void closeIO() {
+            closeIO.run();
         }
     }
-
 }

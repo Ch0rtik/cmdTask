@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,6 +35,7 @@ class MergerLauncherTest {
                     "hello, World!\n" +
                     "Hell , World!"});
         assertTrue(FileUtils.contentEquals(tempOut, new File(path + "ignoreOut.txt")));
+
 
         MergerLauncher.main(new String[]{"-o", tempPath, "-s", "5", path + "In.txt"});
         assertTrue(FileUtils.contentEquals(tempOut, new File(path + "skipOut.txt")));
