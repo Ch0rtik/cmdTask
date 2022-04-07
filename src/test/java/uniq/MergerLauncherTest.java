@@ -11,43 +11,50 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MergerLauncherTest {
+    void assertFileOutput(String[] args, File actual, File expected) throws IOException {
+        MergerLauncher.main(args);
+        assertTrue(FileUtils.contentEquals(actual, expected));
+    }
+
+    void assertConsoleOutput(String[] args, String expected) {
+        String consoleOutput = "";
+        try {
+            consoleOutput = tapSystemOut(() -> MergerLauncher.main(args));
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        assertEquals(expected, consoleOutput.trim());
+    }
 
     @Test
     void main() throws IOException {
-        String path = "src/test/resources/";
-        String tempPath = "src/test/resources/tempOut.txt";
-        File tempOut = new File(tempPath);
+        final String RESOURCE_PATH = "src/test/resources/";
+        File tempOut = new File(RESOURCE_PATH +"tempOut.txt");
         tempOut.createNewFile();
 
-        MergerLauncher.main(new String[]{"-o", tempPath, path + "In.txt"});
-        assertTrue(FileUtils.contentEquals(tempOut, new File(path + "simpleOut.txt")));
+        assertFileOutput(new String[]{"-o", tempOut.getPath(), RESOURCE_PATH + "In.txt"},
+                tempOut, new File(RESOURCE_PATH +"simpleOut.txt"));
 
-        MergerLauncher.main(new String[]{"-o", tempPath, "-c", path + "In.txt"});
-        assertTrue(FileUtils.contentEquals(tempOut, new File(path + "countOut.txt")));
+        assertFileOutput(new String[]{"-o", tempOut.getPath(), "-c", RESOURCE_PATH + "In.txt"},
+                tempOut, new File(RESOURCE_PATH +"countOut.txt"));
 
-        MergerLauncher.main(new String[]{"-o", tempPath, "-i",
-                    "Hello, world!\n" +
-                    "Hello, world!!!\n" +
-                    "hello, world!\n" +
-                    "hello, world!\n" +
-                    "hello, World!\n" +
-                    "Hell , World!"});
-        assertTrue(FileUtils.contentEquals(tempOut, new File(path + "ignoreOut.txt")));
+        assertFileOutput(new String[]{"-o", tempOut.getPath(), "-i",
+                                "Hello, world!\n" +
+                                "Hello, world!!!\n" +
+                                "hello, world!\n" +
+                                "hello, world!\n" +
+                                "hello, World!\n" +
+                                "Hell , World!"},
+                tempOut, new File(RESOURCE_PATH +"ignoreOut.txt"));
 
-
-        MergerLauncher.main(new String[]{"-o", tempPath, "-s", "5", path + "In.txt"});
-        assertTrue(FileUtils.contentEquals(tempOut, new File(path + "skipOut.txt")));
-
-        String consoleOutput = "";
-        try {
-            consoleOutput = tapSystemOut(() -> MergerLauncher.main(new String[]{"-s", "5", "-i", path + "In.txt"}));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        assertEquals("Hello, world!\r\n" +
-                    "Hello, world!!!\r\n" +
-                   "hello, world!", consoleOutput.trim());
+        assertFileOutput(new String[]{"-o", tempOut.getPath(), "-s", "5", RESOURCE_PATH + "In.txt"},
+                tempOut, new File(RESOURCE_PATH +"skipOut.txt"));
 
         tempOut.delete();
+
+        assertConsoleOutput(new String[]{"-s", "5", "-i", RESOURCE_PATH + "In.txt"},
+                "Hello, world!\r\n" +
+                "Hello, world!!!\r\n" +
+                "hello, world!");
     }
 }
