@@ -25,13 +25,11 @@ public class CommandLineArgument {
     @Option(name = "-o", metaVar = "ofile", usage = "Output file name")
     public File outFile;
 
-    @Argument(metaVar = "Arguments", usage = "Either a name of a file OR a text")
+    @Argument(metaVar = "arguments", usage = "Either a name of a file OR a text")
     public List<String> arguments = new ArrayList<>();
-
 
     public CommandLineArgument(String[] args) {
         CmdLineParser parser = new CmdLineParser(this);
-
         try {
             parser.parseArgument(args);
         } catch (CmdLineException e) {

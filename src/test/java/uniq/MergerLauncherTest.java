@@ -17,7 +17,6 @@ class MergerLauncherTest {
         String path = "src/test/resources/";
         String tempPath = "src/test/resources/tempOut.txt";
         File tempOut = new File(tempPath);
-
         tempOut.createNewFile();
 
         MergerLauncher.main(new String[]{"-o", tempPath, path + "In.txt"});
@@ -38,7 +37,6 @@ class MergerLauncherTest {
 
         MergerLauncher.main(new String[]{"-o", tempPath, "-s", "5", path + "In.txt"});
         assertTrue(FileUtils.contentEquals(tempOut, new File(path + "skipOut.txt")));
-
 
         String consoleOutput = "";
         try {

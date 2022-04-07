@@ -16,10 +16,8 @@
     </properties>
 
 
-
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -64,9 +62,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
             </plugin>
-
         </plugins>
     </build>
+
 
     <dependencies>
         <dependency>
@@ -81,12 +79,14 @@
             <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.11.0</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>com.github.stefanbirkner</groupId>
             <artifactId>system-lambda</artifactId>
@@ -94,8 +94,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-
 
 
 </project>

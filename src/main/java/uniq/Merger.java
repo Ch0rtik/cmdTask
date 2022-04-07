@@ -41,7 +41,7 @@ public class Merger {
         io.closeIO();
     }
 
-    private class LineHandler {
+    private static class LineHandler {
         private final BiFunction<String, String, Boolean> linesEqual;
         private final BiFunction<String, Integer, String> withCounter;
         private final Function<String, String> withSkip;
