@@ -11,12 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MergerLauncherTest {
-    void assertFileOutput(String[] args, File actual, File expected) throws IOException {
+    private void assertFileOutput(String[] args, File actual, File expected) throws IOException {
         MergerLauncher.main(args);
         assertTrue(FileUtils.contentEquals(actual, expected));
     }
 
-    void assertConsoleOutput(String[] args, String expected) {
+    private void assertConsoleOutput(String[] args, String expected) {
         String consoleOutput = "";
         try {
             consoleOutput = tapSystemOut(() -> MergerLauncher.main(args));

@@ -77,6 +77,7 @@ public class Merger {
             Runnable closeReader;
             Runnable closeWriter;
 
+            //Setting up reader
             if (arguments.size() == 1 && arguments.get(0).endsWith(".txt")) {
                 BufferedReader reader = new BufferedReader(new FileReader(arguments.get(0)));
                 getLine = () -> {
@@ -107,6 +108,7 @@ public class Merger {
                 closeReader = () -> {};
             }
 
+            //Setting up writer
             if (outFile != null) {
                 if (!outFile.exists()) {
                     throw new IOException(String.format("File %s does not exist", outFile.getName()));
