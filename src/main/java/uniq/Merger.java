@@ -30,23 +30,23 @@ public class Merger {
                 cnt ++;
                 continue;
             }
-            if (!uniqueOnly || cnt == 1) io.printLine(lh.withCounter(prev, cnt));
+            if (!uniqueOnly || cnt == 1) io.printLine(lh.addCounter(prev, cnt));
             prev = line;
             cnt = 1;
         }
-        if (!uniqueOnly || cnt == 1) io.printLine(lh.withCounter(prev, cnt));
+        if (!uniqueOnly || cnt == 1) io.printLine(lh.addCounter(prev, cnt));
 
         io.closeIO();
     }
 
     private static class LineHandler {
         private final BiFunction<String, String, Boolean> linesEqual;
-        private final BiFunction<String, Integer, String> withCounter;
+        private final BiFunction<String, Integer, String> addCounter;
         private final Function<String, String> withSkip;
 
         public LineHandler(boolean countMerged, boolean regIgnored, int skip) {
             linesEqual = regIgnored? String::equalsIgnoreCase: String::equals;
-            withCounter = countMerged?
+            addCounter = countMerged?
                     (String prev, Integer cnt) -> (cnt + (cnt==1?" merge  | ": " merges | ")) + prev:
                     (String prev, Integer cnt) -> prev;
             withSkip = skip==0?
@@ -58,8 +58,8 @@ public class Merger {
             return linesEqual.apply(withSkip(prev), withSkip(line));
         }
 
-        public String withCounter(String prev, Integer cnt) {
-            return withCounter.apply(prev, cnt);
+        public String addCounter(String prev, Integer cnt) {
+            return addCounter.apply(prev, cnt);
         }
 
         private String withSkip(String line) {
