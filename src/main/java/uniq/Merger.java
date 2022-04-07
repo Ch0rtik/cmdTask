@@ -9,12 +9,12 @@ import java.util.function.Supplier;
 
 public class Merger {
     private final boolean uniqueOnly;
-    private final LineHandler lineHandler;
+    private final LineHandler lh;
     private IOHandler io;
 
     public Merger(boolean regIgnored, int skip, boolean countMerged, boolean uniqueOnly) {
         this.uniqueOnly = uniqueOnly;
-        lineHandler = new LineHandler(countMerged, regIgnored, skip);
+        lh = new LineHandler(countMerged, regIgnored, skip);
     }
 
     public void merge(List<String> arguments, File outFile) throws IOException{
@@ -28,15 +28,15 @@ public class Merger {
         int cnt = 1;
 
         while ((line = io.getLine()) != null) {
-            if (lineHandler.linesEqual(prev, line)) {
+            if (lh.linesEqual(prev, line)) {
                 cnt ++;
                 continue;
             }
-            if (!uniqueOnly || cnt == 1) io.printLine(lineHandler.withCounter(prev, cnt));
+            if (!uniqueOnly || cnt == 1) io.printLine(lh.withCounter(prev, cnt));
             prev = line;
             cnt = 1;
         }
-        if (!uniqueOnly || cnt == 1) io.printLine(lineHandler.withCounter(prev, cnt));
+        if (!uniqueOnly || cnt == 1) io.printLine(lh.withCounter(prev, cnt));
 
         io.closeIO();
     }
@@ -105,7 +105,7 @@ public class Merger {
                 };
 
             } else {
-                Iterator<String> linesIterator = lineHandler.getLinesList(arguments).listIterator();
+                Iterator<String> linesIterator = lh.getLinesList(arguments).listIterator();
                 getLine = () -> {
                     try {
                         return linesIterator.next();
