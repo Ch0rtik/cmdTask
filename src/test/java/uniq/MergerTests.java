@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErr;
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,10 +33,26 @@ class MergerTests {
         assertEquals(expected, consoleOutput.trim());
     }
 
+    private void assertConsoleErr(String[] args, String expected) {
+        String consoleOutput = "";
+        try {
+            consoleOutput = tapSystemErr(() -> MergerLauncher.main(args));
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        assertEquals(expected, consoleOutput.trim());
+    }
+
     @Test
-    void fileInput() throws IOException {
+    void fileInputOutput() throws IOException {
         assertFileOutput(new String[]{"-o", RESOURCE_PATH + "tempOut.txt", RESOURCE_PATH + "In.txt"},
                 new File(RESOURCE_PATH +"simpleOut.txt"));
+
+        assertConsoleErr(new String[]{"-o", RESOURCE_PATH + "tempOut.txt", RESOURCE_PATH + "In2.txt"},
+                "src\\test\\resources\\In2.txt (Не удается найти указанный файл)");
+
+        assertConsoleErr(new String[]{"-o", RESOURCE_PATH + "Out.txt", RESOURCE_PATH + "In.txt"},
+                "src\\test\\resources\\Out.txt (Не удается найти указанный файл)");
     }
 
     @Test

@@ -111,7 +111,7 @@ public class Merger {
             //Setting up writer
             if (outFile != null) {
                 if (!outFile.exists()) {
-                    throw new IOException(String.format("File %s does not exist", outFile.getName()));
+                    throw new IOException(String.format("%s (Не удается найти указанный файл)", outFile.getPath()));
                 }
 
                 BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
