@@ -160,7 +160,7 @@ public class Merger {
 
         private List<String> splitByLines(String lines) {
             //return new ArrayList<>(Arrays.asList(lines.split(System.lineSeparator())));
-            return new ArrayList<>(Arrays.asList(lines.split("((`r)|\\r)?(('n)|\\n)")));
+            return new ArrayList<>(Arrays.asList(lines.split("((`r)|\\r)?((`n)|\\n)")));
         }
     }
 }
