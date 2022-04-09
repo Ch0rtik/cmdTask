@@ -11,12 +11,12 @@ import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class MergerTests {
-    final String RESOURCE_PATH = "src/test/resources/";
+class UniqTests {
+    private final String RESOURCE_PATH = "src/test/resources/";
     private void assertFileOutput(String[] args, File expected) throws IOException {
         File tempOut = new File(RESOURCE_PATH +"tempOut.txt");
         tempOut.createNewFile();
-        MergerLauncher.main(args);
+        UniqLauncher.main(args);
 
         assertTrue(FileUtils.contentEquals(tempOut, expected));
 
@@ -26,7 +26,7 @@ class MergerTests {
     private void assertConsoleOutput(String[] args, String expected) {
         String consoleOutput = "";
         try {
-            consoleOutput = tapSystemOut(() -> MergerLauncher.main(args));
+            consoleOutput = tapSystemOut(() -> UniqLauncher.main(args));
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
@@ -36,7 +36,7 @@ class MergerTests {
     private void assertConsoleErr(String[] args, String expected) {
         String consoleOutput = "";
         try {
-            consoleOutput = tapSystemErr(() -> MergerLauncher.main(args));
+            consoleOutput = tapSystemErr(() -> UniqLauncher.main(args));
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
@@ -86,7 +86,7 @@ class MergerTests {
     }
 
     @Test
-    void consoleOutput() throws IOException {
+    void consoleOutput() {
         assertConsoleOutput(new String[]{"-s", "5", "-i", RESOURCE_PATH + "In.txt"},
                 "Hello, world!\r\n" +
                         "Hello, world!!!\r\n" +

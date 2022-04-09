@@ -2,14 +2,14 @@ package uniq;
 
 import java.io.IOException;
 
-public class MergerLauncher {
+public class UniqLauncher {
 
     public static void main(String[] args) {
-        new MergerLauncher().readCmdArguments(args);
+        new UniqLauncher().readCmdArguments(args);
     }
 
     private void readCmdArguments(String[] args){
-        CommandLineArgument values = new CommandLineArgument(args);
+        CommandLineArguments values = new CommandLineArguments(args);
 
         Merger merger = new Merger(values.regIgnored, values.skip, values.countMerged, values.uniqueOnly);
 

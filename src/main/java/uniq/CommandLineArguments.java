@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommandLineArgument {
+public class CommandLineArguments {
     @Option(name = "-i", usage = "Ignore the register")
     public boolean regIgnored;
 
@@ -28,7 +28,7 @@ public class CommandLineArgument {
     @Argument(metaVar = "arguments", usage = "Either a name of a file OR a text")
     public List<String> arguments = new ArrayList<>();
 
-    public CommandLineArgument(String[] args) {
+    public CommandLineArguments(String[] args) {
         CmdLineParser parser = new CmdLineParser(this);
         try {
             parser.parseArgument(args);

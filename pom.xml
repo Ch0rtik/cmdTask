@@ -38,7 +38,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>uniq.MergerLauncher</mainClass>
+                            <mainClass>uniq.UniqLauncher</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
