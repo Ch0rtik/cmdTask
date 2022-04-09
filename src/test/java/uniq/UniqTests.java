@@ -71,11 +71,11 @@ class UniqTests {
     @Test
     void consoleInput() throws IOException {
         assertFileOutput(new String[]{"-o", RESOURCE_PATH + "tempOut.txt", "-i",
-                "Hello, world!\n" +
-                        "Hello, world!!!\n" +
-                        "hello, world!\n" +
-                        "hello, world!\n" +
-                        "hello, World!\n" +
+                "Hello, world!\r\n" +
+                        "Hello, world!!!\r\n" +
+                        "hello, world!\r\n" +
+                        "hello, world!\r\n" +
+                        "hello, World!\r\n" +
                         "Hell , World!"}, new File(RESOURCE_PATH +"ignoreOut.txt"));
     }
 

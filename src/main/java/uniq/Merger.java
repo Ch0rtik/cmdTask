@@ -159,6 +159,7 @@ public class Merger {
         }
 
         private List<String> splitByLines(String lines) {
+            //return new ArrayList<>(Arrays.asList(lines.split(System.lineSeparator())));
             return new ArrayList<>(Arrays.asList(lines.split("\\r?\\n")));
         }
     }

@@ -36,6 +36,5 @@ public class CommandLineArguments {
             System.err.println(e.getMessage());
             parser.printUsage(System.err);
         }
-
     }
 }
