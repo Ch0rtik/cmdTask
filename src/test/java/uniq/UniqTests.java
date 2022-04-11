@@ -12,9 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UniqTests {
-    private final String RESOURCE_PATH = "src/test/resources/";
-    private void assertFileOutput(String[] args, File expected) throws IOException {
-        File tempOut = new File(RESOURCE_PATH +"tempOut.txt");
+    private void assertFileOutput(String[] args, String expectedFileName) throws IOException {
+        File expected =  new File(getPath(expectedFileName));
+        File tempOut = new File(getPath("tempOut.txt"));
         tempOut.createNewFile();
         UniqLauncher.main(args);
 
@@ -43,51 +43,55 @@ class UniqTests {
         assertEquals(expected, consoleOutput.trim());
     }
 
+    private String getPath(String fileName) {
+        return "src/test/resources/" + fileName;
+    }
+
     @Test
     void fileInputOutput() throws IOException {
-        assertFileOutput(new String[]{"-o", RESOURCE_PATH + "tempOut.txt", RESOURCE_PATH + "In.txt"},
-                new File(RESOURCE_PATH +"simpleOut.txt"));
+        assertFileOutput(new String[]{"-o", getPath("tempOut.txt"), getPath("In.txt")},
+                "simpleOut.txt");
 
-        assertConsoleErr(new String[]{"-o", RESOURCE_PATH + "tempOut.txt", RESOURCE_PATH + "In2.txt"},
+        assertConsoleErr(new String[]{"-o", getPath("tempOut.txt"), getPath("In2.txt")},
                 "src\\test\\resources\\In2.txt (Не удается найти указанный файл)");
 
-        assertConsoleErr(new String[]{"-o", RESOURCE_PATH + "Out.txt", RESOURCE_PATH + "In.txt"},
+        assertConsoleErr(new String[]{"-o", getPath("Out.txt"), getPath("In.txt")},
                 "src\\test\\resources\\Out.txt (Не удается найти указанный файл)");
     }
 
     @Test
     void withCounter() throws IOException {
-        assertFileOutput(new String[]{"-o", RESOURCE_PATH + "tempOut.txt", "-c", RESOURCE_PATH + "In.txt"},
-                new File(RESOURCE_PATH +"countOut.txt"));
+        assertFileOutput(new String[]{"-o", getPath("tempOut.txt"), "-c", getPath("In.txt")},
+                "countOut.txt");
     }
 
     @Test
     void ignoreCase() throws IOException {
-        assertFileOutput(new String[]{"-o", RESOURCE_PATH + "tempOut.txt", "-i", RESOURCE_PATH + "In.txt"},
-                new File(RESOURCE_PATH +"ignoreOut.txt"));
+        assertFileOutput(new String[]{"-o", getPath("tempOut.txt"), "-i", getPath("In.txt")},
+                "ignoreOut.txt");
 
     }
 
     @Test
     void consoleInput() throws IOException {
-        assertFileOutput(new String[]{"-o", RESOURCE_PATH + "tempOut.txt", "-i",
+        assertFileOutput(new String[]{"-o", getPath("tempOut.txt"), "-i",
                 "Hello, world!\r\n" +
                         "Hello, world!!!\r\n" +
                         "hello, world!\r\n" +
                         "hello, world!\r\n" +
                         "hello, World!\r\n" +
-                        "Hell , World!"}, new File(RESOURCE_PATH +"ignoreOut.txt"));
+                        "Hell , World!"}, "ignoreOut.txt");
     }
 
     @Test
     void withSkip() throws IOException{
-        assertFileOutput(new String[]{"-o", RESOURCE_PATH + "tempOut.txt", "-s", "5", RESOURCE_PATH + "In.txt"},
-                new File(RESOURCE_PATH +"skipOut.txt"));
+        assertFileOutput(new String[]{"-o", getPath("tempOut.txt"), "-s", "5", getPath("In.txt")},
+                "skipOut.txt");
     }
 
     @Test
     void consoleOutput() {
-        assertConsoleOutput(new String[]{"-s", "5", "-i", RESOURCE_PATH + "In.txt"},
+        assertConsoleOutput(new String[]{"-s", "5", "-i", getPath("In.txt")},
                 "Hello, world!\r\n" +
                         "Hello, world!!!\r\n" +
                         "hello, world!");
