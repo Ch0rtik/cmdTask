@@ -114,18 +114,6 @@ public class Merger {
                 };
 
                 closeReader = scanner::close;
-
-
-                /**Iterator<String> linesIterator = getLinesList(arguments).listIterator();
-                getLine = () -> {
-                    try {
-                        return linesIterator.next();
-                    } catch (NoSuchElementException e) {
-                        return null;
-                    }
-                };
-                closeReader = () -> {};
-                 **/
             }
 
             //Setting up writer
@@ -155,8 +143,17 @@ public class Merger {
                     }
                 };
             } else {
-                printLine = System.out::println;
-                closeWriter = () -> {};
+                if (inFile == null || !isTextFile(inFile)) {
+                    List<String> result = new ArrayList<>();
+                    printLine = result::add;
+                    closeWriter = () -> {
+                        result.forEach(System.out::println);
+                    };
+                } else {
+                    printLine = System.out::println;
+                    closeWriter = () -> {
+                    };
+                }
             }
 
             closeIO = () -> {
