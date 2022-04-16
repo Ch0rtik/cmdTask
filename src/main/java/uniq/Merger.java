@@ -19,8 +19,8 @@ public class Merger {
         lh = new LineHandler(countMerged, regIgnored, skip);
     }
 
-    public void merge(List<String> arguments, File outFile) throws IOException{
-        mergeLines(new IOHandler(arguments, outFile));
+    public void merge(File inFile, File outFile) throws IOException{
+        mergeLines(new IOHandler(inFile, outFile));
     }
 
     private void mergeLines(IOHandler io) {
@@ -79,13 +79,13 @@ public class Merger {
         private final Consumer<String> printLine;
         private final Runnable closeIO;
 
-        public IOHandler(List<String> arguments, File outFile) throws IOException {
+        public IOHandler(File inFile, File outFile) throws IOException {
             Runnable closeReader;
             Runnable closeWriter;
 
             //Setting up reader
-            if (getLinesList(arguments).size() == 1 && isTextFile(arguments)) {
-                BufferedReader reader = new BufferedReader(new FileReader(arguments.get(0)));
+            if (inFile != null && isTextFile(inFile)) {
+                BufferedReader reader = new BufferedReader(new FileReader(inFile));
                 getLine = () -> {
                     try {
                         return reader.readLine();
@@ -105,7 +105,18 @@ public class Merger {
                 };
 
             } else {
-                Iterator<String> linesIterator = getLinesList(arguments).listIterator();
+                Scanner scanner = new Scanner(System.in);
+                getLine = () -> {
+                    if (scanner.hasNextLine()) {
+                        return scanner.nextLine();
+                    }
+                    return null;
+                };
+
+                closeReader = scanner::close;
+
+
+                /**Iterator<String> linesIterator = getLinesList(arguments).listIterator();
                 getLine = () -> {
                     try {
                         return linesIterator.next();
@@ -114,6 +125,7 @@ public class Merger {
                     }
                 };
                 closeReader = () -> {};
+                 **/
             }
 
             //Setting up writer
@@ -165,24 +177,15 @@ public class Merger {
             closeIO.run();
         }
 
-        private boolean isTextFile(List<String> arguments) throws IOException {
-            File file = new File(arguments.get(0));
-            if(!file.exists()) {
-                throw new IOException(String.format("%s doesn't exist", arguments.get(0)));
+        private boolean isTextFile(File inFile) throws IOException {
+            if(!inFile.exists()) {
+                throw new IOException(String.format("%s doesn't exist", inFile.getName()));
             }
-            Path path = FileSystems.getDefault().getPath(arguments.get(0));
+            Path path = FileSystems.getDefault().getPath(inFile.getPath());
             String type = Files.probeContentType(path);
             if (!type.equals("text/plain")) throw new IllegalArgumentException("File is not text");
-            if (file.length() == 0) throw new IllegalArgumentException("File is empty");
+            if (inFile.length() == 0) throw new IllegalArgumentException("File is empty");
             return true;
-        }
-
-        private List<String> getLinesList(List<String> arguments) {
-            return splitByLines(String.join(" ", arguments));
-        }
-
-        private List<String> splitByLines(String lines) {
-            return new ArrayList<>(Arrays.asList(lines.split("(\\r?\\n)|((`r)?`n)")));
         }
     }
 }

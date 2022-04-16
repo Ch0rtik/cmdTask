@@ -27,7 +27,7 @@ public class UniqLauncher {
     private File outFile;
 
     @Argument(metaVar = "arguments", usage = "Either a name of a file OR a text")
-    private List<String> arguments = new ArrayList<>();
+    private File inFile;
 
     public static void main(String[] args) throws IOException {
         new UniqLauncher().readCmdArguments(args);
@@ -44,6 +44,6 @@ public class UniqLauncher {
         }
         Merger merger = new Merger(regIgnored, skip, countMerged, uniqueOnly);
 
-        merger.merge(arguments, outFile);
+        merger.merge(inFile, outFile);
     }
 }

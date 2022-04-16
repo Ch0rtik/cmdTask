@@ -76,7 +76,7 @@ class UniqTests {
                         "hello, world!");
     }
 
-    @Test
+    /**@Test
     void consoleInput() throws IOException {
         assertFileOutput(new String[]{"-o", getPath("tempOut.txt"), "-i",
                 "Hello, world!\r\n" +
@@ -91,5 +91,6 @@ class UniqTests {
     void emptyInput() {
         assertThrows(IllegalArgumentException.class, () -> UniqLauncher.main(new String[]{"-o", getPath("tempOut.txt"), getPath("EmptyIn.txt")}));
     }
+    **/
 
 }
