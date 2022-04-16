@@ -84,7 +84,7 @@ public class Merger {
             Runnable closeWriter;
 
             //Setting up reader
-            if (arguments.size() == 1 && isTextFile(arguments)) {
+            if (getLinesList(arguments).size() == 1 && isTextFile(arguments)) {
                 BufferedReader reader = new BufferedReader(new FileReader(arguments.get(0)));
                 getLine = () -> {
                     try {
@@ -168,7 +168,7 @@ public class Merger {
         private boolean isTextFile(List<String> arguments) throws IOException {
             File file = new File(arguments.get(0));
             if(!file.exists()) {
-                return false;
+                throw new IOException(String.format("%s doesn't exist", arguments.get(0)));
             }
             Path path = FileSystems.getDefault().getPath(arguments.get(0));
             String type = Files.probeContentType(path);

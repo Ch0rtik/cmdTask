@@ -2,11 +2,11 @@ package uniq;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
+import org.kohsuke.args4j.CmdLineException;
 
 import java.io.File;
 import java.io.IOException;
 
-import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErr;
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -77,7 +77,19 @@ class UniqTests {
     }
 
     @Test
-    void emptyInput() throws IOException {
-        assertThrows(IllegalArgumentException.class, () -> {UniqLauncher.main(new String[]{"-o", getPath("tempOut.txt"), getPath("EmptyIn.txt")});});
+    void consoleInput() throws IOException {
+        assertFileOutput(new String[]{"-o", getPath("tempOut.txt"), "-i",
+                "Hello, world!\r\n" +
+                        "Hello, world!!!\r\n" +
+                        "hello, world!\r\n" +
+                        "hello, world!\r\n" +
+                        "hello, World!\r\n" +
+                        "Hell , World!"}, "ignoreOut.txt");
     }
+
+    @Test
+    void emptyInput() {
+        assertThrows(IllegalArgumentException.class, () -> UniqLauncher.main(new String[]{"-o", getPath("tempOut.txt"), getPath("EmptyIn.txt")}));
+    }
+
 }
