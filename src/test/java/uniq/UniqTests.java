@@ -8,8 +8,7 @@ import java.io.IOException;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErr;
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UniqTests {
     private void assertFileOutput(String[] args, String expectedFileName) throws IOException {
@@ -33,16 +32,6 @@ class UniqTests {
         assertEquals(expected, consoleOutput.trim());
     }
 
-    private void assertConsoleErr(String[] args, String expected) {
-        String consoleOutput = "";
-        try {
-            consoleOutput = tapSystemErr(() -> UniqLauncher.main(args));
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-        assertEquals(expected, consoleOutput.trim());
-    }
-
     private String getPath(String fileName) {
         return "src/test/resources/" + fileName;
     }
@@ -51,12 +40,12 @@ class UniqTests {
     void fileInputOutput() throws IOException {
         assertFileOutput(new String[]{"-o", getPath("tempOut.txt"), getPath("In.txt")},
                 "simpleOut.txt");
-
-        assertConsoleErr(new String[]{"-o", getPath("tempOut.txt"), getPath("In2.txt")},
-                "src\\test\\resources\\In2.txt (Не удается найти указанный файл)");
-
-        assertConsoleErr(new String[]{"-o", getPath("Out.txt"), getPath("In.txt")},
-                "src\\test\\resources\\Out.txt (Не удается найти указанный файл)");
+        assertThrows(IOException.class, () -> {
+            UniqLauncher.main(new String[]{"-o", getPath("tempOut.txt"), getPath("In2.txt")});
+        });
+        assertThrows(IOException.class, () -> {
+            UniqLauncher.main(new String[]{"-o", getPath("Out.txt"), getPath("In.txt")});
+        });
     }
 
     @Test
@@ -72,16 +61,6 @@ class UniqTests {
 
     }
 
-    @Test
-    void consoleInput() throws IOException {
-        assertFileOutput(new String[]{"-o", getPath("tempOut.txt"), "-i",
-                "Hello, world!\r\n" +
-                        "Hello, world!!!\r\n" +
-                        "hello, world!\r\n" +
-                        "hello, world!\r\n" +
-                        "hello, World!\r\n" +
-                        "Hell , World!"}, "ignoreOut.txt");
-    }
 
     @Test
     void withSkip() throws IOException{
@@ -95,5 +74,10 @@ class UniqTests {
                 "Hello, world!\r\n" +
                         "Hello, world!!!\r\n" +
                         "hello, world!");
+    }
+
+    @Test
+    void emptyInput() throws IOException {
+        assertThrows(IllegalArgumentException.class, () -> {UniqLauncher.main(new String[]{"-o", getPath("tempOut.txt"), getPath("EmptyIn.txt")});});
     }
 }

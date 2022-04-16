@@ -1,6 +1,9 @@
 package uniq;
 
 import java.io.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -42,28 +45,31 @@ public class Merger {
     private static class LineHandler {
         private final BiFunction<String, String, Boolean> linesEqual;
         private final BiFunction<String, Integer, String> addCounter;
-        private final Function<String, String> withSkip;
+        private final Function<String, String> skipFirstSymbols;
 
         public LineHandler(boolean countMerged, boolean regIgnored, int skip) {
             linesEqual = regIgnored? String::equalsIgnoreCase: String::equals;
             addCounter = countMerged?
-                    (String prev, Integer cnt) -> (cnt + (cnt==1?" merge  | ": " merges | ")) + prev:
+                    (String prev, Integer cnt) -> {
+                        if (prev != null) return (cnt + (cnt==1?" merge  | ": " merges | ")) + prev;
+                        return "";
+                    }:
                     (String prev, Integer cnt) -> prev;
-            withSkip = skip==0?
+            skipFirstSymbols = skip==0?
                     (String line) -> line:
                     (String line) -> skip < line.length()? line.substring(skip): "";
         }
 
         public boolean linesEqual(String prev, String line) {
-            return linesEqual.apply(withSkip(prev), withSkip(line));
+            return linesEqual.apply(skipFirstSymbols(prev), skipFirstSymbols(line));
         }
 
         public String addCounter(String prev, Integer cnt) {
             return addCounter.apply(prev, cnt);
         }
 
-        private String withSkip(String line) {
-            return withSkip.apply(line);
+        private String skipFirstSymbols(String line) {
+            return skipFirstSymbols.apply(line);
         }
 
     }
@@ -78,13 +84,14 @@ public class Merger {
             Runnable closeWriter;
 
             //Setting up reader
-            if (arguments.size() == 1 && arguments.get(0).endsWith(".txt")) {
+            if (arguments.size() == 1 && isTextFile(arguments)) {
                 BufferedReader reader = new BufferedReader(new FileReader(arguments.get(0)));
                 getLine = () -> {
                     try {
                         return reader.readLine();
                     } catch (IOException e) {
                         System.err.println(e.getMessage());
+                        System.exit(1);
                         return null;
                     }
                 };
@@ -93,6 +100,7 @@ public class Merger {
                         reader.close();
                     } catch (IOException e) {
                         System.err.println(e.getMessage());
+                        System.exit(1);
                     }
                 };
 
@@ -111,16 +119,18 @@ public class Merger {
             //Setting up writer
             if (outFile != null) {
                 if (!outFile.exists()) {
-                    throw new IOException(String.format("%s (Не удается найти указанный файл)", outFile.getPath()));
+                    throw new IOException(String.format("%s doesn't exist", outFile.getPath()));
                 }
 
                 BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
                 printLine = (String line) -> {
+                    if (line == null) return;
                     try{
                         writer.write(line);
                         writer.newLine();
                     } catch (IOException e) {
                         System.err.println(e.getMessage());
+                        System.exit(1);
                     }
                 };
 
@@ -129,6 +139,7 @@ public class Merger {
                         writer.close();
                     } catch (IOException e) {
                         System.err.println(e.getMessage());
+                        System.exit(1);
                     }
                 };
             } else {
@@ -152,6 +163,18 @@ public class Merger {
 
         public void closeIO() {
             closeIO.run();
+        }
+
+        private boolean isTextFile(List<String> arguments) throws IOException {
+            File file = new File(arguments.get(0));
+            if(!file.exists()) {
+                return false;
+            }
+            Path path = FileSystems.getDefault().getPath(arguments.get(0));
+            String type = Files.probeContentType(path);
+            if (!type.equals("text/plain")) throw new IllegalArgumentException("File is not text");
+            if (file.length() == 0) throw new IllegalArgumentException("File is empty");
+            return true;
         }
 
         private List<String> getLinesList(List<String> arguments) {
