@@ -110,6 +110,9 @@ public class Merger {
 
             } else {
                 Scanner scanner = new Scanner(System.in);
+                if (!scanner.hasNextLine()) {
+                    throw new IllegalArgumentException("No lines have benn passed");
+                }
                 getLine = () -> {
                     if (scanner.hasNextLine()) {
                         return scanner.nextLine();

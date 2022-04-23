@@ -68,6 +68,13 @@ class UniqTests {
     }
 
     @Test
+    void emptyConsoleInput() throws Exception {
+        withTextFromSystemIn().execute(() -> {assertThrows(IllegalArgumentException.class, () ->{
+            UniqLauncher.main(new String[]{});
+        });});
+    }
+
+    @Test
     void consoleOutput() {
         assertConsoleOutput(new String[]{getPath("In.txt")},
                 "Hello, world!\r\n" +
@@ -123,7 +130,7 @@ class UniqTests {
     }
 
     @Test
-    void everyOption() throws IOException{
+    void everyPossibleOption() throws IOException{
         assertFileOutput(new String[] {"-o", getPath("tempOut.txt"), "-s", "5", "-i", "-c", getPath("In.txt")}, "everyOut.txt");
 
     }
