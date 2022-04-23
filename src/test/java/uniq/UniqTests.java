@@ -78,6 +78,21 @@ class UniqTests {
     }
 
     @Test
+    void consoleInputOutput() throws Exception{
+        withTextFromSystemIn("Hello, world!",
+                "Hello, world!!!",
+                "hello, world!",
+                "hello, world!",
+                "hello, World!",
+                "Hell , World!").execute(() -> assertConsoleOutput(new String[]{},
+                "Hello, world!\r\n" +
+                        "Hello, world!!!\r\n" +
+                        "hello, world!\r\n" +
+                        "hello, World!\r\n" +
+                        "Hell , World!"));
+    }
+
+    @Test
     void withCounter() throws IOException {
         assertFileOutput(new String[]{"-o", getPath("tempOut.txt"), "-c", getPath("In.txt")},
                 "countOut.txt");
