@@ -183,7 +183,6 @@ public class Merger {
             Path path = FileSystems.getDefault().getPath(inFile.getPath());
             String type = Files.probeContentType(path);
             if (!type.equals("text/plain")) throw new IllegalArgumentException("File is not text");
-            if (inFile.length() == 0) throw new IllegalArgumentException("File is empty");
             return true;
         }
     }

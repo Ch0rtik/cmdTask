@@ -47,7 +47,13 @@ class UniqTests {
         assertThrows(IOException.class, () -> {
             UniqLauncher.main(new String[]{"-o", getPath("tempOut.txt"), getPath("In2.txt")});
         });
+    }
 
+    @Test
+    void nonTextInputFile() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            UniqLauncher.main(new String[]{getPath("MilenNikolov.jpg")});
+        });
     }
 
     @Test
