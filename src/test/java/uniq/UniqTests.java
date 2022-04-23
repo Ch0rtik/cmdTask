@@ -1,13 +1,13 @@
 package uniq;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.Test;
-import org.kohsuke.args4j.CmdLineException;
+import org.junit.jupiter.api.Test;;
 
 import java.io.File;
 import java.io.IOException;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
+import static com.github.stefanbirkner.systemlambda.SystemLambda.withTextFromSystemIn;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UniqTests {
@@ -40,12 +40,41 @@ class UniqTests {
     void fileInputOutput() throws IOException {
         assertFileOutput(new String[]{"-o", getPath("tempOut.txt"), getPath("In.txt")},
                 "simpleOut.txt");
+    }
+
+    @Test
+    void noInputFile() {
         assertThrows(IOException.class, () -> {
             UniqLauncher.main(new String[]{"-o", getPath("tempOut.txt"), getPath("In2.txt")});
         });
-        assertThrows(IOException.class, () -> {
-            UniqLauncher.main(new String[]{"-o", getPath("Out.txt"), getPath("In.txt")});
-        });
+
+    }
+
+    @Test
+    void emptyInputFile() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            UniqLauncher.main(new String[]{"-o", getPath("tempOut.txt"), getPath("EmptyIn.txt")});});
+
+    }
+
+    @Test
+    void consoleInput() throws IOException, Exception {
+        withTextFromSystemIn("Hello, world!",
+                "Hello, world!!!",
+                "hello, world!",
+                "hello, world!",
+                "hello, World!",
+                "Hell , World!").execute(() -> {assertFileOutput(new String[]{"-o", getPath("tempOut.txt")}, "simpleOut.txt");});
+    }
+
+    @Test
+    void consoleOutput() {
+        assertConsoleOutput(new String[]{getPath("In.txt")},
+                "Hello, world!\r\n" +
+                        "Hello, world!!!\r\n" +
+                        "hello, world!\r\n" +
+                        "hello, World!\r\n" +
+                        "Hell , World!");
     }
 
     @Test
@@ -61,7 +90,6 @@ class UniqTests {
 
     }
 
-
     @Test
     void withSkip() throws IOException{
         assertFileOutput(new String[]{"-o", getPath("tempOut.txt"), "-s", "5", getPath("In.txt")},
@@ -69,28 +97,19 @@ class UniqTests {
     }
 
     @Test
-    void consoleOutput() {
-        assertConsoleOutput(new String[]{"-s", "5", "-i", getPath("In.txt")},
-                "Hello, world!\r\n" +
-                        "Hello, world!!!\r\n" +
-                        "hello, world!");
-    }
-
-    /**@Test
-    void consoleInput() throws IOException {
-        assertFileOutput(new String[]{"-o", getPath("tempOut.txt"), "-i",
-                "Hello, world!\r\n" +
-                        "Hello, world!!!\r\n" +
-                        "hello, world!\r\n" +
-                        "hello, world!\r\n" +
-                        "hello, World!\r\n" +
-                        "Hell , World!"}, "ignoreOut.txt");
+    void negativeSkip(){
+        assertThrows(IllegalArgumentException.class, ()-> {
+            UniqLauncher.main(new String[]{"-o", getPath("tempOut.txt"), "-s", "-5", getPath("In.txt")});});
     }
 
     @Test
-    void emptyInput() {
-        assertThrows(IllegalArgumentException.class, () -> UniqLauncher.main(new String[]{"-o", getPath("tempOut.txt"), getPath("EmptyIn.txt")}));
+    void uniqueOnly() throws IOException{
+        assertFileOutput(new String[] {"-u", "-o", getPath("tempOut.txt"), getPath("In.txt")}, "uniqueOut.txt");
     }
-    **/
 
+    @Test
+    void everyOption() throws IOException{
+        assertFileOutput(new String[] {"-o", getPath("tempOut.txt"), "-s", "5", "-i", "-c", getPath("In.txt")}, "everyOut.txt");
+
+    }
 }

@@ -51,7 +51,7 @@ public class Merger {
             linesEqual = regIgnored? String::equalsIgnoreCase: String::equals;
             addCounter = countMerged?
                     (String prev, Integer cnt) -> {
-                        if (prev != null) return (cnt + (cnt==1?" merge  | ": " merges | ")) + prev;
+                        if (prev != null) return cnt + (cnt==1?" merge  | ": " merges | ") + prev;
                         return "";
                     }:
                     (String prev, Integer cnt) -> prev;
@@ -85,6 +85,7 @@ public class Merger {
 
             //Setting up reader
             if (inFile != null && isTextFile(inFile)) {
+                if (inFile.length() == 0) throw new IllegalArgumentException("File is empty");
                 BufferedReader reader = new BufferedReader(new FileReader(inFile));
                 getLine = () -> {
                     try {
@@ -112,16 +113,11 @@ public class Merger {
                     }
                     return null;
                 };
-
                 closeReader = scanner::close;
             }
 
             //Setting up writer
             if (outFile != null) {
-                if (!outFile.exists()) {
-                    throw new IOException(String.format("%s doesn't exist", outFile.getPath()));
-                }
-
                 BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
                 printLine = (String line) -> {
                     if (line == null) return;

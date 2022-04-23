@@ -7,8 +7,6 @@ import org.kohsuke.args4j.Option;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class UniqLauncher {
     @Option(name = "-i", usage = "Ignore the register")
@@ -26,14 +24,16 @@ public class UniqLauncher {
     @Option(name = "-o", metaVar = "ofile", usage = "Output file name")
     private File outFile;
 
-    @Argument(metaVar = "arguments", usage = "Either a name of a file OR a text")
+    @Argument(metaVar = "arguments", usage = "Input file name")
     private File inFile;
 
     public static void main(String[] args) throws IOException {
-        new UniqLauncher().readCmdArguments(args);
+        UniqLauncher launcher = new UniqLauncher();
+        launcher.readCmdArguments(args);
+        launcher.launchMerger();
     }
 
-    private void readCmdArguments(String[] args) throws IOException {
+    private void readCmdArguments(String[] args) {
         CmdLineParser parser = new CmdLineParser(this);
         try {
             parser.parseArgument(args);
@@ -42,6 +42,12 @@ public class UniqLauncher {
             parser.printUsage(System.err);
             System.exit(1);
         }
+        if (skip < 0) {
+            throw new IllegalArgumentException("Skip can't be negative");
+        }
+    }
+
+    private void launchMerger() throws IOException {
         Merger merger = new Merger(regIgnored, skip, countMerged, uniqueOnly);
 
         merger.merge(inFile, outFile);
