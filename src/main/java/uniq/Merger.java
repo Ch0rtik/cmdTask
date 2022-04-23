@@ -111,7 +111,7 @@ public class Merger {
             } else {
                 Scanner scanner = new Scanner(System.in);
                 if (!scanner.hasNextLine()) {
-                    throw new IllegalArgumentException("No lines have benn passed");
+                    throw new IllegalArgumentException("No lines have been passed");
                 }
                 getLine = () -> {
                     if (scanner.hasNextLine()) {

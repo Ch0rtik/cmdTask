@@ -136,7 +136,7 @@ class UniqTests {
     }
 
     @Test
-    void everyPossibleOption() throws IOException{
+    void everyPossibleFlag() throws IOException{
         assertFileOutput(new String[] {"-o", getPath("tempOut.txt"), "-s", "5", "-i", "-c", getPath("In.txt")}, "everyOut.txt");
 
     }
