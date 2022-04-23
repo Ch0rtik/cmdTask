@@ -51,7 +51,10 @@ public class Merger {
             linesEqual = regIgnored? String::equalsIgnoreCase: String::equals;
             addCounter = countMerged?
                     (String prev, Integer cnt) -> {
-                        if (prev != null) return cnt + (cnt==1?" merge  | ": " merges | ") + prev;
+                        if (prev != null){
+                            String merges = cnt==1?"merge ": "merges";
+                            return String.format("%d %s | %s", cnt, merges, prev);
+                        }
                         return "";
                     }:
                     (String prev, Integer cnt) -> prev;
