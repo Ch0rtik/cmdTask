@@ -50,6 +50,14 @@ public class UniqLauncher {
     private void launchMerger() throws IOException {
         Merger merger = new Merger(regIgnored, skip, countMerged, uniqueOnly);
 
-        merger.merge(inFile, outFile);
+        try {
+            merger.merge(inFile, outFile);
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
+
+
+
     }
 }

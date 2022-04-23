@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;;
 import java.io.File;
 import java.io.IOException;
 
-import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut;
-import static com.github.stefanbirkner.systemlambda.SystemLambda.withTextFromSystemIn;
+import static com.github.stefanbirkner.systemlambda.SystemLambda.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UniqTests {
@@ -32,6 +31,18 @@ class UniqTests {
         assertEquals(expected, consoleOutput.trim());
     }
 
+    private void assertSystemExit(int expected, String[] args) throws Exception {
+        int statusCode;
+        if (args.length == 0) {
+            statusCode = catchSystemExit(() -> {withTextFromSystemIn().execute(() -> UniqLauncher.main(args));});
+        } else {
+            statusCode = catchSystemExit(() -> {
+                UniqLauncher.main(args);
+            });
+        }
+        assertEquals(expected, statusCode);
+    }
+
     private String getPath(String fileName) {
         return "src/test/resources/" + fileName;
     }
@@ -50,17 +61,14 @@ class UniqTests {
     }
 
     @Test
-    void nonTextInputFile() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            UniqLauncher.main(new String[]{getPath("MilenNikolov.jpg")});
-        });
+    void nonTextInputFile() throws Exception {
+        assertSystemExit(1, new String[]{getPath("MilenNikolov.jpg")});
+
     }
 
     @Test
-    void emptyInputFile() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            UniqLauncher.main(new String[]{"-o", getPath("tempOut.txt"), getPath("EmptyIn.txt")});});
-
+    void emptyInputFile() throws Exception {
+        assertSystemExit(1, new String[]{"-o", getPath("tempOut.txt"), getPath("EmptyIn.txt")});
     }
 
     @Test
@@ -75,9 +83,7 @@ class UniqTests {
 
     @Test
     void emptyConsoleInput() throws Exception {
-        withTextFromSystemIn().execute(() -> {assertThrows(IllegalArgumentException.class, () ->{
-            UniqLauncher.main(new String[]{});
-        });});
+        assertSystemExit(1, new String[]{});
     }
 
     @Test
