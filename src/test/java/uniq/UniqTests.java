@@ -43,6 +43,7 @@ class UniqTests {
         assertEquals(expected, statusCode);
     }
 
+
     private String getPath(String fileName) {
         return "src/test/resources/" + fileName;
     }
