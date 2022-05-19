@@ -145,7 +145,7 @@ public class Merger {
                     }
                 };
             } else {
-                if (inFile == null || !isTextFile(inFile)) {
+                if (inFile == null) {
                     List<String> result = new ArrayList<>();
                     printLine = result::add;
                     closeWriter = () -> {
@@ -153,8 +153,7 @@ public class Merger {
                     };
                 } else {
                     printLine = System.out::println;
-                    closeWriter = () -> {
-                    };
+                    closeWriter = () -> {};
                 }
             }
 

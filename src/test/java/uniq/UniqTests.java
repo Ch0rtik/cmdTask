@@ -64,7 +64,6 @@ class UniqTests {
     @Test
     void nonTextInputFile() throws Exception {
         assertSystemExit(1, new String[]{getPath("MilenNikolov.jpg")});
-
     }
 
     @Test

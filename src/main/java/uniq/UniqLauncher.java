@@ -40,7 +40,7 @@ public class UniqLauncher {
         } catch (CmdLineException e) {
             System.err.println(e.getMessage());
             parser.printUsage(System.err);
-            System.exit(1);
+            System.exit(2);
         }
         if (skip < 0) {
             throw new IllegalArgumentException("Skip can't be negative");
